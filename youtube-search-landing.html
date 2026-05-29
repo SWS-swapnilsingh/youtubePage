@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>YoSearch 🎬</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --red: #FF0000;
+    --red-dark: #cc0000;
+    --red-light: #ffe5e5;
+    --bg: #FFF9F0;
+    --card: #ffffff;
+    --text: #1a1a1a;
+    --muted: #888;
+    --radius: 24px;
+    --shadow: 0 8px 32px rgba(255, 0, 0, 0.12);
+  }
+
+  body {
+    min-height: 100vh;
+    background: var(--bg);
+    font-family: 'Nunito', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Floating blobs */
+  .blob {
+    position: fixed;
+    border-radius: 50%;
+    opacity: 0.12;
+    animation: float 8s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .blob-1 { width: 340px; height: 340px; background: var(--red); top: -80px; left: -80px; animation-delay: 0s; }
+  .blob-2 { width: 220px; height: 220px; background: #ff6600; bottom: -60px; right: -40px; animation-delay: 2s; }
+  .blob-3 { width: 160px; height: 160px; background: var(--red); bottom: 60px; left: 80px; animation-delay: 4s; }
+  .blob-4 { width: 100px; height: 100px; background: #ff6600; top: 120px; right: 100px; animation-delay: 3s; }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-20px) scale(1.04); }
+  }
+
+  /* Card */
+  .card {
+    position: relative;
+    z-index: 1;
+    background: var(--card);
+    border-radius: 36px;
+    padding: 56px 52px 48px;
+    max-width: 560px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(255, 0, 0, 0.15), 0 4px 16px rgba(0,0,0,0.06);
+    animation: pop-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+
+  @keyframes pop-in {
+    0% { opacity: 0; transform: scale(0.85) translateY(30px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  /* Logo area */
+  .logo-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    margin-bottom: 8px;
+  }
+
+  .play-icon {
+    width: 56px;
+    height: 56px;
+    background: var(--red);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 16px rgba(255,0,0,0.35);
+    animation: wiggle 4s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+
+  @keyframes wiggle {
+    0%, 100% { transform: rotate(-3deg); }
+    50% { transform: rotate(3deg); }
+  }
+
+  .play-icon svg { margin-left: 4px; }
+
+  .brand {
+    font-family: 'Fredoka One', cursive;
+    font-size: 42px;
+    color: var(--text);
+    letter-spacing: -0.5px;
+    line-height: 1;
+  }
+
+  .brand span { color: var(--red); }
+
+  .tagline {
+    text-align: center;
+    color: var(--muted);
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 36px;
+    letter-spacing: 0.3px;
+  }
+
+  /* Search box */
+  .search-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 20px;
+  }
+
+  #search-input {
+    width: 100%;
+    padding: 18px 64px 18px 22px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 17px;
+    font-weight: 600;
+    border: 2.5px solid #f0e8e8;
+    border-radius: 999px;
+    background: #fff8f8;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  }
+
+  #search-input::placeholder { color: #ccc; font-weight: 500; }
+
+  #search-input:focus {
+    border-color: var(--red);
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(255,0,0,0.10);
+  }
+
+  .search-btn {
+    position: absolute;
+    right: 8px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--red);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, transform 0.15s;
+    box-shadow: 0 4px 12px rgba(255,0,0,0.3);
+  }
+
+  .search-btn:hover { background: var(--red-dark); transform: scale(1.08); }
+  .search-btn:active { transform: scale(0.96); }
+
+  /* Suggestions */
+  .suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 28px;
+  }
+
+  .chip {
+    background: #fff0f0;
+    color: var(--red-dark);
+    font-family: 'Nunito', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 7px 16px;
+    border-radius: 999px;
+    border: 1.5px solid #ffd5d5;
+    cursor: pointer;
+    transition: background 0.18s, transform 0.15s, border-color 0.18s;
+    user-select: none;
+  }
+
+  .chip:hover {
+    background: var(--red);
+    color: #fff;
+    border-color: var(--red);
+    transform: translateY(-2px);
+  }
+
+  .chip:active { transform: scale(0.96); }
+
+  /* Hint */
+  .hint {
+    text-align: center;
+    font-size: 12.5px;
+    color: #ccc;
+    margin-top: 24px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+
+  /* Pulse dot */
+  .live-dot {
+    display: inline-block;
+    width: 7px; height: 7px;
+    background: var(--red);
+    border-radius: 50%;
+    margin-right: 5px;
+    vertical-align: middle;
+    animation: pulse 1.4s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.6); }
+  }
+</style>
+</head>
+<body>
+
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="blob blob-3"></div>
+<div class="blob blob-4"></div>
+
+<div class="card">
+  <div class="logo-wrap">
+    <div class="play-icon">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+        <polygon points="6,3 19,11 6,19" fill="white"/>
+      </svg>
+    </div>
+    <div class="brand">Yo<span>Tube</span></div>
+  </div>
+
+  <p class="tagline"><span class="live-dot"></span>Search anything. Watch everything.</p>
+
+  <div class="search-wrap">
+    <input
+      id="search-input"
+      type="text"
+      placeholder="Type something fun to watch..."
+      autocomplete="off"
+    />
+    <button class="search-btn" id="search-btn" aria-label="Search">
+      <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
+        <circle cx="11" cy="11" r="7" stroke="white" stroke-width="2.2"/>
+        <path d="M16.5 16.5 L21 21" stroke="white" stroke-width="2.2" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="suggestions">
+    <div class="chip" data-q="lo-fi music">🎵 Lo-fi music</div>
+    <div class="chip" data-q="funny cats">😹 Funny cats</div>
+    <div class="chip" data-q="learn javascript">💻 Learn JS</div>
+    <div class="chip" data-q="cooking recipes">🍜 Recipes</div>
+    <div class="chip" data-q="travel vlogs">✈️ Travel vlogs</div>
+    <div class="chip" data-q="motivational speech">🔥 Motivation</div>
+  </div>
+
+  <p class="hint">Press Enter ↵ or click the button to search on YouTube</p>
+</div>
+
+<script>
+  function doSearch(q) {
+    if (!q.trim()) return;
+    window.open('https://www.youtube.com/results?search_query=' + encodeURIComponent(q.trim()), '_blank');
+  }
+
+  document.getElementById('search-input').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') doSearch(this.value);
+  });
+
+  document.getElementById('search-btn').addEventListener('click', function() {
+    doSearch(document.getElementById('search-input').value);
+  });
+
+  document.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', function() {
+      const q = this.dataset.q;
+      document.getElementById('search-input').value = q;
+      doSearch(q);
+    });
+  });
+</script>
+</body>
+</html>
